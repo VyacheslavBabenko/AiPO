@@ -1,59 +1,53 @@
-#include <stdio.h>
-#include <math.h>
-#define EPS	1e-5
-#define ABS(x)	((x) > 0 ? (x) : -(x))
+#include<stdio.h>
+#include<math.h>
+#include<stdlib.h>
 
-double integrate(double a, double b, double c, double (*f)(double), int n) {
-	double s = 0;
-	double h = (b - a) / n;
-	double xi;
-	for (xi = a; xi < b; xi += h)
-		s += (f(xi) - c) * h;
-	return s;
+double function_sin(double x){
+    return sin(x);
 }
 
-double space(double a, double b, double c, double (*f)(double)) {
-	int n = 32;
-	double s1 = integrate(a, b, c, f, n);
-	n *= 2;
-	double s2 = integrate(a, b, c, f, n);
-	while (ABS(s1 - s2) > EPS) {
-		s1 = s2;
-		n *= 2;
-		s2 = integrate(a, b, c, f, n); 
-	}
-	return s1;
+double function_cos(double x){
+    return x*cos(x);
 }
 
-double xcos(double x) {
-	return x * cos(x);
+double function_tg(double x){
+    return x*x+x-tan(x);
 }
 
-double sqx_plus_x_minus_tg(double x) {
-	return pow(x, 2) + x - tan(x);
+double function_e(double x){
+    return exp(x)+3;
 }
 
-double exp_plus_3(double x) {
-	return exp(x) + 3;
+double ABS(double x){
+    if(x<0) 
+		return -x;
+    return x;
 }
 
-double search(double s, double a, double b, double c) {
-	double (*f[4])(double) = {sin, xcos, sqx_plus_x_minus_tg, exp_plus_3};
-	double max = -1.0;
-	int i;
-	for (i = 0; i < 4; i++) {
-		double t = space(a, b, c, f[i]);
-		printf("%lf\n", t);
-		if (s >= t && t > max)
-			max = t;
-	}
-	return max;
+double integrate(double (*f)(double),double a,double b,double c){
+    double integral=0.0,i,E=0.000001;
+    for(i=a;i<=b;i+=E)
+        integral+=(f(i)-c);
+    return integral*E;
 }
 
-int main(void) {
-	double s, a, b, c;
-	scanf("%lf%lf%lf%lf", &s, &a, &b, &c);
-	printf("%lf\n", search(s, a, b, c));
-	return 0;
+int main(){
+    double s,a,b,c,temp;
+    struct answer{
+        double value;
+        int number;
+    } answer;
+    answer.value=0;
+    double (*f[4])(double)={function_sin,function_cos,function_tg,function_e};
+    scanf("%lf %lf %lf %lf",&s,&a,&b,&c);
+    int i;
+    for(i=0;i<4;i++){
+        temp=integrate(f[i],a,b,c);
+        if(temp>answer.value && temp<=s){
+            answer.value=temp;
+            answer.number=i;
+        }
+    }
+    printf("%d %lf",answer.number,answer.value);
+    return 0;
 }
-
