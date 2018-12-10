@@ -1,0 +1,42 @@
+#!/bin/bash
+function libgd_installer(){
+        echo Installing libgd
+        local version=$1
+        cd ~/Downloads
+        if [ -f libgd-$version.tar.xz ]
+        then
+             echo libgd-$version already downloaded
+        else
+             wget "https://github.com/libgd/libgd/releases/download/gd-$version/libgd-$version.tar.xz" -O libgd-$version.tar.xz
+        fi
+  tar -xvf libgd-$version.tar.xz
+        cd libgd-$version
+        ./configure --prefix=/gpfs/home/vbabenko/soft/libgd
+        make install
+
+        echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/gpfs/home/vbabenko/soft/libgd/lib" | tee -a ~/.bash_profile
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/gpfs/home/vbabenko/soft/libgd/lib
+}
+
+function gnuplot_installer(){
+        echo Installing gnuplot
+        local version=$1
+        cd ~/Downloads
+        if [ -f gnuplot-$version.tar.gz ]
+        then
+             echo gnuplot-$version already downloaded
+        else
+             wget "https://kent.dl.sourceforge.net/project/gnuplot/gnuplot/$version/gnuplot-$version.tar.gz" --no-check-certificate
+        fi
+           tar -xzvf gnuplot-$version.tar.gz
+        cd gnuplot-$version
+
+        ./configure --prefix=/gpfs/home/vbabenko/soft/gnuplot --with-gd=/gpfs/home/vbabenko/soft/libgd
+        make install
+
+        echo "export PATH=$PATH:/gpfs/home/vbabenko/bin" | tee -a ~/.bash_profile
+        export PATH=$PATH:/gpfs/home/vbabenko/bin
+        ln -s ~/soft/gnuplot/bin/gnuplot ~/bin/gnuplot-$version
+}
+libgd_installer $2
+gnuplot_installer $1
